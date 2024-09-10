@@ -17,7 +17,6 @@ import argparse
 #%%
 def parse_args():
     parser = argparse.ArgumentParser(description="Train YOLO model with frozen layers")
-    parser.add_argument('-p', '--path', type=str, required=True, help="Path to the base directory")
     parser.add_argument('-v', '--video', type=str, required=True, help="Path to the base directory")
     return parser.parse_args()
 
@@ -70,11 +69,10 @@ def predict_cnn(image):
 def main():
 
     args = parse_args()
-    base_path = args.path
     video_path = args.video
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    cnn_path = os.path.join(base_path, "results/CNN5/best_model.ckpt")
+    cnn_path = "./checkpoints/CNN5_model.ckpt"
     cnn_model = SimpleCNNLightning.load_from_checkpoint(cnn_path)
     cnn_model = cnn_model.to(device)
     cnn_model.eval() 
@@ -85,7 +83,7 @@ def main():
     ])
 
     #%%
-    yolo_path = os.path.join(base_path, "results/transfer/weights/best.pt")
+    yolo_path = "./checkpoints/best.pt"
     model = YOLO(yolo_path)
     cap = cv2.VideoCapture(video_path) # Open the video file
     num = 0 # count the number of frames
@@ -132,3 +130,6 @@ def main():
             break
     cap.release()
     cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
